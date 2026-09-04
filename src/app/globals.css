@@ -26,6 +26,17 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (pointer: fine) {
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  body {
+    cursor: none;
+  }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);

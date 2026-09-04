@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ThemeVars from "@/components/ThemeVars";
+import CustomCursor from "@/components/CustomCursor";
 import { getSiteSettings } from "@/lib/data";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,6 +27,7 @@ export default async function RootLayout({
         <ThemeVars settings={settings} />
       </head>
       <body className="flex min-h-full flex-col font-sans antialiased">
+        <CustomCursor />
         <Navbar settings={settings} />
         <main className="flex-1">{children}</main>
         <Footer settings={settings} />

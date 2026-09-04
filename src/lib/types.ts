@@ -20,9 +20,36 @@ export type Post = {
   category?: Category | null;
 };
 
+export type Product = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  type: "template" | "ebook";
+  price_kes: number;
+  cover_image_url: string | null;
+  file_path: string | null;
+  published: boolean;
+  created_at: string;
+};
+
+export type Order = {
+  id: string;
+  product_id: string | null;
+  buyer_name: string | null;
+  buyer_email: string;
+  amount: number;
+  currency: string;
+  status: "pending" | "paid" | "failed";
+  intasend_checkout_id: string | null;
+  created_at: string;
+  paid_at: string | null;
+};
+
 export type SiteSettings = {
   id: number;
   site_name: string;
+  blog_name: string;
   tagline: string;
   bio: string;
   primary_color: string;

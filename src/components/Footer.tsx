@@ -31,9 +31,19 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
             </Link>
           </div>
         </div>
-        <p className="text-muted mt-8 text-xs">
-          © {new Date().getFullYear()} {settings.site_name}. All rights reserved.
-        </p>
+        <div className="text-muted mt-8 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <p>
+            © {new Date().getFullYear()} {settings.site_name}. All rights reserved.
+          </p>
+          <div className="flex gap-4">
+            <Link href="/privacy-policy" className="hover:text-primary">
+              Privacy Policy
+            </Link>
+            <Link href="/terms-of-service" className="hover:text-primary">
+              Terms of Service
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

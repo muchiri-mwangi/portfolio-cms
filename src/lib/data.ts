@@ -1,9 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Category, Post, SiteSettings } from "@/lib/types";
+import type { Category, Post, Product, SiteSettings } from "@/lib/types";
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   id: 1,
   site_name: "Your Name",
+  blog_name: "Muchiri",
   tagline: "Technician & AI Data Annotation Specialist",
   bio: "Update your bio from the admin settings page.",
   primary_color: "#E63946",
@@ -76,6 +77,37 @@ export async function getPublishedPosts(categorySlug?: string): Promise<Post[]> 
     return data ?? [];
   } catch {
     return [];
+  }
+}
+
+export async function getPublishedProducts(): Promise<Product[]> {
+  if (!supabaseConfigured()) return [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  if (!supabaseConfigured()) return null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("slug", slug)
+      .eq("published", true)
+      .single();
+    return data ?? null;
+  } catch {
+    return null;
   }
 }
 
