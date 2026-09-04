@@ -1,0 +1,96 @@
+import { createClient } from "@/lib/supabase/server";
+import type { Category, Post, SiteSettings } from "@/lib/types";
+
+export const DEFAULT_SETTINGS: SiteSettings = {
+  id: 1,
+  site_name: "Your Name",
+  tagline: "Technician & AI Data Annotation Specialist",
+  bio: "Update your bio from the admin settings page.",
+  primary_color: "#E63946",
+  accent_color: "#1D3557",
+  dark_mode: false,
+  avatar_url: null,
+  email: null,
+  phone: null,
+  location: null,
+  linkedin_url: null,
+  github_url: null,
+};
+
+function supabaseConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+}
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  if (!supabaseConfigured()) return DEFAULT_SETTINGS;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("site_settings")
+      .select("*")
+      .eq("id", 1)
+      .single();
+    return data ? { ...DEFAULT_SETTINGS, ...data } : DEFAULT_SETTINGS;
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+export async function getCategories(): Promise<Category[]> {
+  if (!supabaseConfigured()) return [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .order("name", { ascending: true });
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublishedPosts(categorySlug?: string): Promise<Post[]> {
+  if (!supabaseConfigured()) return [];
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("posts")
+      .select("*, category:categories(*)")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (categorySlug) {
+      const { data: cat } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("slug", categorySlug)
+        .single();
+      if (cat) query = query.eq("category_id", cat.id);
+    }
+
+    const { data } = await query;
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  if (!supabaseConfigured()) return null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("posts")
+      .select("*, category:categories(*)")
+      .eq("slug", slug)
+      .eq("published", true)
+      .single();
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}
