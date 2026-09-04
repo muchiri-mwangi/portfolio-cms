@@ -1,81 +1,121 @@
-# Portfolio + Blog CMS
+# Portfolio + Blog CMS + Marketplace
 
-A personal portfolio site (technician + AI data annotation specialist) with a
-built-in admin dashboard for writing blog posts, managing categories, and
-changing the site theme — no code editing required after setup.
+A personal portfolio site (technician + AI data annotation specialist) with:
 
-**Stack:** Next.js (App Router) + Tailwind CSS + Supabase (database, auth,
-storage). Free to host on Vercel + Supabase's free tiers.
+- A built-in admin dashboard for writing blog posts ("Muchiri"), managing
+  categories, and changing the site theme
+- A digital products marketplace (templates, ebooks) with M-Pesa/card
+  checkout via IntaSend
+- A contact form wired to Zapier
+- Animated hero, scroll reveals, and a custom wildlife cursor
+- Privacy Policy / Terms pages for AdSense eligibility
+
+**Stack:** Next.js (App Router) + Tailwind CSS + Framer Motion + Supabase
+(database, auth, storage) + IntaSend (payments). Free to host on Vercel +
+Supabase's free tiers; IntaSend charges a small fee per transaction only.
 
 ## 1. Create your Supabase project (free)
 
 1. Go to https://supabase.com and create a new project.
-2. Once it's ready, open **Project Settings -> API** and copy:
+2. Open **Project Settings -> API** and copy:
    - Project URL
    - `anon` `public` API key
-3. Open the **SQL Editor** in Supabase, paste the entire contents of
-   [`supabase/schema.sql`](./supabase/schema.sql), and run it. This creates:
-   - `posts`, `categories`, `site_settings` tables
-   - Row Level Security so only you (logged in) can write, everyone can read
-     published content
-   - A public `media` storage bucket for cover images / your photo
-   - Three starter categories you can rename or delete
+   - `service_role` key (keep this one secret — server only)
+3. Open the **SQL Editor** and run these three files in order, pasting each
+   one's full contents and running it:
+   1. [`supabase/schema.sql`](./supabase/schema.sql) — posts, categories,
+      site settings, media storage
+   2. [`supabase/002_updates.sql`](./supabase/002_updates.sql) — blog brand
+      name + newsletter subscribers
+   3. [`supabase/003_marketplace.sql`](./supabase/003_marketplace.sql) —
+      products, orders, private file storage
 
 ## 2. Create your admin login
 
-You log in with a normal Supabase user — no separate signup page (keeps
-random people from creating accounts).
+1. In Supabase: **Authentication -> Users -> Add user**.
+2. Create yourself a user with your email + a password (auto-confirm it).
+3. That's your login at `/admin/login`.
 
-1. In Supabase, go to **Authentication -> Users -> Add user**.
-2. Create yourself a user with your email + a password. Confirm the email
-   automatically (toggle "Auto Confirm User" if shown).
-3. That email + password is what you'll use to log in at `/admin/login`.
+## 3. Set up IntaSend (payments)
 
-## 3. Configure environment variables
+1. Sign up at https://intasend.com and grab your **sandbox** API keys first
+   (Settings -> API Keys) to test end to end before going live.
+2. Add `INTASEND_PUBLISHABLE_KEY` and leave `INTASEND_TEST_MODE=true` while
+   testing. Switch to live keys and `INTASEND_TEST_MODE=false` when ready.
+3. In IntaSend's dashboard, add a webhook pointing to
+   `https://your-site.vercel.app/api/webhooks/intasend` and set a challenge
+   string — put the same string in `INTASEND_WEBHOOK_CHALLENGE`. This is how
+   an order gets marked "paid" and unlocks the download automatically.
 
-Copy `.env.example` to `.env.local` and fill in the two values from step 1:
+## 4. Set up the Zapier contact form
+
+1. In Zapier, create a Zap that starts with **Webhooks by Zapier -> Catch
+   Hook**. Copy the webhook URL it gives you.
+2. Paste that into `ZAPIER_CONTACT_WEBHOOK_URL`.
+3. Add a second Zap step — e.g. **Email by Zapier** or **Gmail: Send Email**
+   — to forward the message to your inbox (the payload includes `name`,
+   `email`, and `message`).
+
+## 5. Configure environment variables
 
 ```
 cp .env.example .env.local
 ```
 
-## 4. Run locally
+Fill in every value described above.
+
+## 6. Run locally
 
 ```
 npm install
 npm run dev
 ```
 
-Visit http://localhost:3000 for the public site, and
-http://localhost:3000/admin/login to log in.
+Visit http://localhost:3000, and http://localhost:3000/admin/login to log in.
 
-## 5. Deploy for free (Vercel)
+## 7. Deploy for free (Vercel)
 
-1. Push this repo to GitHub (already done if you're reading this on GitHub).
-2. Go to https://vercel.com, sign in with GitHub, and import this repo.
-3. In the Vercel project's **Environment Variables**, add the same two
-   variables from `.env.local`.
-4. Deploy. You'll get a free `your-project.vercel.app` URL — you can attach a
-   custom domain later for free (you just pay for the domain itself).
+1. Import this repo at https://vercel.com.
+2. Add all the environment variables from `.env.local`, using your real
+   production `NEXT_PUBLIC_SITE_URL`.
+3. Deploy — you'll get a free `.vercel.app` URL (attach a custom domain
+   later if you want one).
+4. Update the IntaSend webhook URL and `NEXT_PUBLIC_SITE_URL` to match your
+   real deployed domain once it's live.
 
 ## Using the admin dashboard
 
-Once deployed, go to `/admin/login` and sign in.
+- **Dashboard** — quick stats.
+- **Posts** — Markdown editor, cover image, category, draft/publish.
+- **Categories** — your blog's field categories.
+- **Products** — add templates/ebooks: title, description, price (KES),
+  cover image, and the private deliverable file. Toggle "Published" to list
+  it in `/marketplace`.
+- **Theme & Settings** — color presets or custom colors, dark mode, your
+  photo, bio, blog brand name ("Muchiri" by default), and contact info.
 
-- **Dashboard** — quick stats on your posts.
-- **Posts** — write new posts in Markdown, upload a cover image, assign a
-  category, and toggle Published/Draft. Drafts never show on the public site.
-- **Categories** — add/remove the field categories your posts are grouped
-  under (e.g. "IT & Networking", "AI & Data Annotation").
-- **Theme & Settings** — pick a color preset or set your own primary/accent
-  colors, toggle dark mode, upload your photo, and edit your bio and contact
-  details. Changes apply across the whole site immediately.
+## How the marketplace works
+
+1. A buyer picks a product and enters their email.
+2. They're redirected to IntaSend's hosted checkout (M-Pesa STK push or
+   card).
+3. IntaSend calls your webhook when payment completes, which marks the
+   order "paid".
+4. The buyer lands back on `/marketplace/order/[id]`, which shows a
+   time-limited download link once payment is confirmed.
+
+## Legal pages
+
+`/privacy-policy` and `/terms-of-service` are starting templates required
+for AdSense approval — read through and customize them (dates, business
+name, specifics) before applying, and consider having them reviewed.
 
 ## Project structure
 
 ```
-src/app/            public pages + admin dashboard (Next.js App Router)
-src/components/     shared UI (Navbar, Footer, PostForm, SettingsForm, ...)
-src/lib/            Supabase clients, data-fetching helpers, TS types
-supabase/schema.sql database schema — run this once in Supabase
+src/app/                    public pages + admin dashboard + marketplace
+src/app/api/webhooks/       IntaSend payment webhook
+src/components/             shared UI (Navbar, Hero, PostForm, ProductForm, CustomCursor, ...)
+src/lib/                    Supabase clients, IntaSend client, data helpers, types
+supabase/*.sql               run these in order in the Supabase SQL Editor
 ```
