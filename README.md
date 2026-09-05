@@ -29,6 +29,9 @@ Supabase's free tiers; IntaSend charges a small fee per transaction only.
       name + newsletter subscribers
    3. [`supabase/003_marketplace.sql`](./supabase/003_marketplace.sql) —
       products, orders, private file storage
+   4. [`supabase/004_marketplace_extras.sql`](./supabase/004_marketplace_extras.sql) —
+      marketplace categories, discount codes, reviews, and the services
+      (gig) platform
 
 ## 2. Create your admin login
 
@@ -86,13 +89,35 @@ Visit http://localhost:3000, and http://localhost:3000/admin/login to log in.
 ## Using the admin dashboard
 
 - **Dashboard** — quick stats.
-- **Posts** — Markdown editor, cover image, category, draft/publish.
+- **Posts** — Markdown editor, cover image, category, draft/publish. Embed a
+  live product grid inside any post with `[[products:category-slug]]`.
 - **Categories** — your blog's field categories.
-- **Products** — add templates/ebooks: title, description, price (KES),
-  cover image, and the private deliverable file. Toggle "Published" to list
-  it in `/marketplace`.
+- **Products** — templates/ebooks: title, description, category, price,
+  optional "original price" for a strikethrough discount, cover image, and
+  the private deliverable file.
+- **Shop Categories** — categories for the marketplace (separate from blog
+  categories).
+- **Services (Gigs)** — offer your time directly: title, description,
+  price, delivery time. Buyers submit a brief and pay up front.
+- **Orders** — every marketplace purchase and every service order in one
+  place. For service orders, mark "in progress" and upload the finished
+  file + a note to mark it delivered — the buyer sees it on their order page.
+- **Customers** — everyone who's bought something, with total spend.
+- **Discounts** — create a code (percent or flat KES off, optional expiry
+  or usage limit); buyers enter it at marketplace checkout.
+- **Reviews** — approve or delete reviews before they show on a product
+  page.
 - **Theme & Settings** — color presets or custom colors, dark mode, your
   photo, bio, blog brand name ("Muchiri" by default), and contact info.
+
+## SEO
+
+A dynamic `sitemap.xml` and `robots.txt` are generated automatically from
+your published posts, products, and services, and pages carry Open Graph /
+Twitter card metadata plus JSON-LD structured data (Product, Article) so
+search engines and social previews pick up real content. Once deployed,
+submit your sitemap (`https://your-site/sitemap.xml`) in Google Search
+Console.
 
 ## How the marketplace works
 
