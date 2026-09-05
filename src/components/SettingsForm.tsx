@@ -142,6 +142,15 @@ export default function SettingsForm({
             />
           </div>
           <div>
+            <label className="text-sm font-semibold">Blog brand name</label>
+            <input
+              name="blog_name"
+              defaultValue={settings.blog_name}
+              className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary"
+            />
+            <p className="text-muted mt-1 text-xs">Shown as the blog&apos;s brand, e.g. on /blog.</p>
+          </div>
+          <div>
             <label className="text-sm font-semibold">Tagline</label>
             <input
               name="tagline"

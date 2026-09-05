@@ -9,6 +9,7 @@ export async function updateSettings(formData: FormData) {
 
   const payload = {
     site_name: String(formData.get("site_name") ?? "").trim(),
+    blog_name: String(formData.get("blog_name") ?? "").trim() || "Muchiri",
     tagline: String(formData.get("tagline") ?? "").trim(),
     bio: String(formData.get("bio") ?? "").trim(),
     primary_color: String(formData.get("primary_color") ?? "#E63946"),
