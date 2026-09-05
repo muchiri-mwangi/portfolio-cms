@@ -119,6 +119,10 @@ export default function PostForm({
             {showPreview ? "Edit" : "Preview"}
           </button>
         </div>
+        <p className="text-muted mb-1 text-xs">
+          Drop in a product grid anywhere with <code>[[products:category-slug]]</code>{" "}
+          (optionally <code>[[products:category-slug:6]]</code> for a custom count).
+        </p>
         {showPreview ? (
           <div className="prose-content border-theme mt-1 min-h-[300px] rounded-lg border px-4 py-3">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>

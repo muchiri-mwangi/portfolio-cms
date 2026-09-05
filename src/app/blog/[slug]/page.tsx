@@ -3,6 +3,8 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getPostBySlug } from "@/lib/data";
+import { parsePostContent } from "@/lib/post-content";
+import ProductEmbedGrid from "@/components/ProductEmbedGrid";
 
 export async function generateMetadata({
   params,
@@ -11,7 +13,17 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  return { title: post?.title ?? "Post not found" };
+  if (!post) return { title: "Post not found" };
+  return {
+    title: post.title,
+    description: post.excerpt ?? undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      images: post.cover_image_url ? [post.cover_image_url] : undefined,
+      type: "article",
+    },
+  };
 }
 
 export default async function BlogPostPage({
@@ -30,8 +42,23 @@ export default async function BlogPostPage({
     year: "numeric",
   });
 
+  const segments = parsePostContent(post.content);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    datePublished: post.created_at,
+    dateModified: post.updated_at,
+    image: post.cover_image_url || undefined,
+  };
+
   return (
     <article className="mx-auto max-w-3xl px-5 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link href="/blog" className="text-primary text-sm font-semibold">
         ← Back to blog
       </Link>
@@ -54,7 +81,15 @@ export default async function BlogPostPage({
       )}
 
       <div className="prose-content mt-10">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+        {segments.map((segment, i) =>
+          segment.type === "markdown" ? (
+            <ReactMarkdown key={i} remarkPlugins={[remarkGfm]}>
+              {segment.value}
+            </ReactMarkdown>
+          ) : (
+            <ProductEmbedGrid key={i} categorySlug={segment.categorySlug} limit={segment.limit} />
+          )
+        )}
       </div>
     </article>
   );

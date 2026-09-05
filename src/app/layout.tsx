@@ -8,9 +8,26 @@ import { getSiteSettings } from "@/lib/data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const title = `${settings.site_name} — ${settings.tagline}`;
+
   return {
-    title: `${settings.site_name} — ${settings.tagline}`,
+    metadataBase: new URL(siteUrl),
+    title,
     description: settings.bio,
+    openGraph: {
+      title,
+      description: settings.bio,
+      siteName: settings.site_name,
+      images: settings.avatar_url ? [settings.avatar_url] : undefined,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: settings.bio,
+      images: settings.avatar_url ? [settings.avatar_url] : undefined,
+    },
   };
 }
 
