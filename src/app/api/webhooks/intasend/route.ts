@@ -5,6 +5,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // match the one you configure in your IntaSend dashboard (Settings ->
 // Webhooks). Set INTASEND_WEBHOOK_CHALLENGE to that same value so we can
 // verify the request actually came from IntaSend.
+//
+// api_ref is prefixed by us at checkout time: "p_<order id>" for a
+// marketplace product order, "s_<order id>" for a service (gig) order —
+// that prefix is how this webhook knows which table to update.
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
 
@@ -17,8 +21,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid challenge" }, { status: 401 });
   }
 
-  // IntaSend's checkout webhook includes api_ref (what we set to our order
-  // id) and state/status fields indicating the payment outcome.
   const apiRef: string | undefined = body.api_ref || body.invoice?.api_ref;
   const state: string | undefined = body.state || body.invoice?.state || body.status;
 
@@ -31,13 +33,21 @@ export async function POST(request: NextRequest) {
   const isPaid = ["COMPLETE", "COMPLETED", "PAID"].includes(String(state).toUpperCase());
   const isFailed = ["FAILED", "CANCELLED"].includes(String(state).toUpperCase());
 
+  if (!isPaid && !isFailed) {
+    return NextResponse.json({ received: true, ignored: true });
+  }
+
+  const [prefix, orderId] = apiRef.includes("_") ? apiRef.split(/_(.+)/) : [null, apiRef];
+  const table = prefix === "s" ? "service_orders" : "orders";
+  const id = orderId ?? apiRef;
+
   if (isPaid) {
     await supabase
-      .from("orders")
+      .from(table)
       .update({ status: "paid", paid_at: new Date().toISOString() })
-      .eq("id", apiRef);
-  } else if (isFailed) {
-    await supabase.from("orders").update({ status: "failed" }).eq("id", apiRef);
+      .eq("id", id);
+  } else {
+    await supabase.from(table).update({ status: "failed" }).eq("id", id);
   }
 
   return NextResponse.json({ received: true });
