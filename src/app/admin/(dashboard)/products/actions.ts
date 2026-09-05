@@ -11,29 +11,29 @@ function uniqueSlug(title: string) {
   return `${base}-${suffix}`;
 }
 
+function readProductFields(formData: FormData) {
+  return {
+    title: String(formData.get("title") ?? "").trim(),
+    description: String(formData.get("description") ?? "").trim(),
+    type: String(formData.get("type") ?? "template"),
+    category_id: String(formData.get("category_id") ?? "") || null,
+    price_kes: Number(formData.get("price_kes") ?? 0),
+    compare_at_price_kes: formData.get("compare_at_price_kes")
+      ? Number(formData.get("compare_at_price_kes"))
+      : null,
+    cover_image_url: String(formData.get("cover_image_url") ?? "") || null,
+    file_path: String(formData.get("file_path") ?? "") || null,
+    published: formData.get("published") === "on",
+  };
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient();
-
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const type = String(formData.get("type") ?? "template");
-  const price_kes = Number(formData.get("price_kes") ?? 0);
-  const cover_image_url = String(formData.get("cover_image_url") ?? "") || null;
-  const file_path = String(formData.get("file_path") ?? "") || null;
-  const published = formData.get("published") === "on";
+  const fields = readProductFields(formData);
 
   const { error, data } = await supabase
     .from("products")
-    .insert({
-      title,
-      slug: uniqueSlug(title),
-      description,
-      type,
-      price_kes,
-      cover_image_url,
-      file_path,
-      published,
-    })
+    .insert({ ...fields, slug: uniqueSlug(fields.title) })
     .select("id")
     .single();
 
@@ -48,19 +48,9 @@ export async function createProduct(formData: FormData) {
 
 export async function updateProduct(productId: string, formData: FormData) {
   const supabase = await createClient();
+  const fields = readProductFields(formData);
 
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const type = String(formData.get("type") ?? "template");
-  const price_kes = Number(formData.get("price_kes") ?? 0);
-  const cover_image_url = String(formData.get("cover_image_url") ?? "") || null;
-  const file_path = String(formData.get("file_path") ?? "") || null;
-  const published = formData.get("published") === "on";
-
-  const { error } = await supabase
-    .from("products")
-    .update({ title, description, type, price_kes, cover_image_url, file_path, published })
-    .eq("id", productId);
+  const { error } = await supabase.from("products").update(fields).eq("id", productId);
 
   if (error) {
     redirect(`/admin/products/${productId}/edit?error=${encodeURIComponent(error.message)}`);

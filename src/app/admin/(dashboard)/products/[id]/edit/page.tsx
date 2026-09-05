@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getProductCategories } from "@/lib/data";
 import ProductForm from "@/components/ProductForm";
 import { updateProduct, deleteProduct } from "../../actions";
 import type { Product } from "@/lib/types";
@@ -17,7 +18,10 @@ export default async function EditProductPage({
   const { error, saved } = await searchParams;
 
   const supabase = await createClient();
-  const { data: product } = await supabase.from("products").select("*").eq("id", id).single();
+  const [{ data: product }, categories] = await Promise.all([
+    supabase.from("products").select("*").eq("id", id).single(),
+    getProductCategories(),
+  ]);
 
   if (!product) notFound();
 
@@ -43,7 +47,7 @@ export default async function EditProductPage({
       )}
 
       <div className="mt-6 max-w-2xl">
-        <ProductForm product={product as Product} action={updateProductWithId} />
+        <ProductForm product={product as Product} categories={categories} action={updateProductWithId} />
       </div>
     </div>
   );
