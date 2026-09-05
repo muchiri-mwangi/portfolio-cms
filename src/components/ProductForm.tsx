@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Product } from "@/lib/types";
+import type { Product, ProductCategory } from "@/lib/types";
 
 export default function ProductForm({
   product,
+  categories,
   action,
 }: {
   product?: Product;
+  categories: ProductCategory[];
   action: (formData: FormData) => void;
 }) {
   const [coverUrl, setCoverUrl] = useState(product?.cover_image_url ?? "");
@@ -98,6 +100,27 @@ export default function ProductForm({
           </select>
         </div>
         <div>
+          <label className="text-sm font-semibold" htmlFor="category_id">
+            Category
+          </label>
+          <select
+            id="category_id"
+            name="category_id"
+            defaultValue={product?.category_id ?? ""}
+            className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 outline-none focus:border-primary"
+          >
+            <option value="">No category</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
           <label className="text-sm font-semibold" htmlFor="price_kes">
             Price (KES)
           </label>
@@ -109,6 +132,20 @@ export default function ProductForm({
             step="1"
             required
             defaultValue={product?.price_kes ?? 0}
+            className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 outline-none focus:border-primary"
+          />
+        </div>
+        <div>
+          <label className="text-sm font-semibold" htmlFor="compare_at_price_kes">
+            Original price (optional — shows a strikethrough discount)
+          </label>
+          <input
+            id="compare_at_price_kes"
+            name="compare_at_price_kes"
+            type="number"
+            min="0"
+            step="1"
+            defaultValue={product?.compare_at_price_kes ?? ""}
             className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 outline-none focus:border-primary"
           />
         </div>
