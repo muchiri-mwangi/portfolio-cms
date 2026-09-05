@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, Tags, Palette, ExternalLink } from "lucide-react";
+import { LayoutDashboard, FileText, Tags, Palette, ExternalLink, ShoppingBag } from "lucide-react";
 import { logout } from "../login/actions";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/posts", label: "Posts", icon: FileText },
   { href: "/admin/categories", label: "Categories", icon: Tags },
+  { href: "/admin/products", label: "Products", icon: ShoppingBag },
   { href: "/admin/settings", label: "Theme & Settings", icon: Palette },
 ];
 
