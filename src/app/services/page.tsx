@@ -1,71 +1,57 @@
 import Link from "next/link";
-import { Cpu, Database, Network, Tags, Wrench, Globe } from "lucide-react";
+import { getPublishedServices } from "@/lib/data";
 
 export const metadata = { title: "Services" };
 
-const services = [
-  {
-    icon: Network,
-    title: "Network Design & Setup",
-    desc: "Planning, installing, and managing computer networks — wired and wireless — for homes, offices, and small businesses.",
-  },
-  {
-    icon: Wrench,
-    title: "Computer Repair & Maintenance",
-    desc: "Diagnostics, hardware repair, software troubleshooting, and preventive maintenance to keep your equipment reliable.",
-  },
-  {
-    icon: Tags,
-    title: "AI Data Annotation",
-    desc: "Accurate labeling and annotation of text, image, and other data for machine learning training pipelines.",
-  },
-  {
-    icon: Database,
-    title: "Database & Software Management",
-    desc: "Building and maintaining databases and custom software tools that fit how your business actually works.",
-  },
-  {
-    icon: Cpu,
-    title: "IT Technical Support",
-    desc: "Ongoing, dependable support for the everyday technical issues that slow a business down.",
-  },
-  {
-    icon: Globe,
-    title: "Web Development",
-    desc: "Websites and web applications, from simple business sites to full platforms with custom features.",
-  },
-];
+export default async function ServicesPage() {
+  const services = await getPublishedServices();
 
-export default function ServicesPage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-16">
       <p className="text-primary text-sm font-bold uppercase tracking-widest">Services</p>
-      <h1 className="mt-2 text-4xl font-black">How I can help</h1>
+      <h1 className="mt-2 text-4xl font-black">Book my time directly</h1>
       <p className="text-muted mt-4 max-w-2xl text-lg">
-        A mix of hands-on technical work and the precision data work that AI
-        systems depend on.
+        Networking, IT support, and AI data annotation — order below and I'll deliver within the stated timeframe.
       </p>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((s) => (
-          <div key={s.title} className="border-theme rounded-2xl border p-6">
-            <s.icon className="text-primary" size={28} />
-            <h3 className="mt-4 font-bold">{s.title}</h3>
-            <p className="text-muted mt-2 text-sm">{s.desc}</p>
-          </div>
+          <Link
+            key={s.id}
+            href={`/services/${s.slug}`}
+            className="group border-theme flex flex-col overflow-hidden rounded-2xl border transition-shadow hover:shadow-lg"
+          >
+            <div className="bg-soft relative aspect-[4/3] w-full overflow-hidden">
+              {s.cover_image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={s.cover_image_url}
+                  alt={s.title}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              ) : (
+                <div className="bg-accent/10 flex h-full w-full items-center justify-center text-4xl font-black text-accent/30">
+                  {s.title.charAt(0)}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-1 flex-col gap-2 p-5">
+              <h3 className="font-bold group-hover:text-primary">{s.title}</h3>
+              <p className="text-muted line-clamp-2 text-sm">{s.description}</p>
+              <div className="mt-auto flex items-center justify-between pt-2">
+                <span className="font-black">KES {Number(s.price_kes).toLocaleString()}</span>
+                <span className="text-muted text-xs">{s.delivery_days}-day delivery</span>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
 
-      <div className="bg-soft mt-16 rounded-2xl p-8 text-center">
-        <h2 className="text-2xl font-black">Have a project in mind?</h2>
-        <p className="text-muted mt-2">Let&apos;s talk about what you need.</p>
-        <Link
-          href="/contact"
-          className="bg-primary mt-6 inline-block rounded-full px-6 py-3 text-sm font-bold text-white"
-        >
-          Get in touch
-        </Link>
-      </div>
+      {services.length === 0 && (
+        <p className="text-muted mt-16 text-center">
+          Services are being set up — check back soon, or reach out via the contact page.
+        </p>
+      )}
     </div>
   );
 }
