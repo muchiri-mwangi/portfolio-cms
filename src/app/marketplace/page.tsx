@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getProductCategories, getPublishedProducts } from "@/lib/data";
 
 export const metadata = { title: "Marketplace" };
+export const revalidate = 60;
 
 export default async function MarketplacePage({
   searchParams,

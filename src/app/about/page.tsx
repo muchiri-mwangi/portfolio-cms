@@ -1,6 +1,7 @@
 import { getSiteSettings } from "@/lib/data";
 
 export const metadata = { title: "About" };
+export const revalidate = 60;
 
 export default async function AboutPage() {
   const settings = await getSiteSettings();

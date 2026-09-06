@@ -5,6 +5,8 @@ import PostCard from "@/components/PostCard";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
 
+export const revalidate = 60;
+
 const skills = [
   {
     icon: Network,

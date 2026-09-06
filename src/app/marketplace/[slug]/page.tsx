@@ -4,6 +4,8 @@ import { getApprovedReviews, getProductBySlug } from "@/lib/data";
 import { buyProduct } from "../actions";
 import { submitReview } from "../reviews-actions";
 
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {

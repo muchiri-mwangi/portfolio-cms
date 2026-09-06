@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getPublishedServices } from "@/lib/data";
 
 export const metadata = { title: "Services" };
+export const revalidate = 60;
 
 export default async function ServicesPage() {
   const services = await getPublishedServices();

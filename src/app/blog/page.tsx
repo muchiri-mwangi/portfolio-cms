@@ -3,6 +3,8 @@ import { getCategories, getPublishedPosts, getSiteSettings } from "@/lib/data";
 import PostCard from "@/components/PostCard";
 import { subscribeToNewsletter } from "./actions";
 
+export const revalidate = 60;
+
 export const metadata = { title: "Blog" };
 
 export default async function BlogPage({

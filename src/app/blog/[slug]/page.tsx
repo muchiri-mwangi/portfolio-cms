@@ -6,6 +6,8 @@ import { getPostBySlug } from "@/lib/data";
 import { parsePostContent } from "@/lib/post-content";
 import ProductEmbedGrid from "@/components/ProductEmbedGrid";
 
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {

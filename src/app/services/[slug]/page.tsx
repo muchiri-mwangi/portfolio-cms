@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/lib/data";
 import { orderService } from "../actions";
 
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {
