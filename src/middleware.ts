@@ -6,7 +6,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  // Only /admin needs the auth check + session refresh. Running this on
+  // every public page (home, blog, marketplace...) meant an extra
+  // Supabase auth round-trip before ANY page could render — a big part of
+  // why the site felt slow. Public pages don't need it at all.
+  matcher: ["/admin/:path*"],
 };

@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
+import { createPublicClient } from "@/lib/supabase/public";
 import type {
   Category,
   Post,
@@ -33,10 +34,13 @@ function supabaseConfigured() {
   );
 }
 
-export async function getSiteSettings(): Promise<SiteSettings> {
+// Every function below is wrapped in React's cache() so that calling it
+// more than once during the same render (e.g. the root layout AND a page
+// both need the site settings) hits the database once, not once per call.
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   if (!supabaseConfigured()) return DEFAULT_SETTINGS;
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("site_settings")
       .select("*")
@@ -46,12 +50,12 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   } catch {
     return DEFAULT_SETTINGS;
   }
-}
+});
 
-export async function getCategories(): Promise<Category[]> {
+export const getCategories = cache(async (): Promise<Category[]> => {
   if (!supabaseConfigured()) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("categories")
       .select("*")
@@ -60,12 +64,12 @@ export async function getCategories(): Promise<Category[]> {
   } catch {
     return [];
   }
-}
+});
 
-export async function getPublishedPosts(categorySlug?: string): Promise<Post[]> {
+export const getPublishedPosts = cache(async (categorySlug?: string): Promise<Post[]> => {
   if (!supabaseConfigured()) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let query = supabase
       .from("posts")
       .select("*, category:categories(*)")
@@ -86,12 +90,12 @@ export async function getPublishedPosts(categorySlug?: string): Promise<Post[]> 
   } catch {
     return [];
   }
-}
+});
 
-export async function getPostBySlug(slug: string): Promise<Post | null> {
+export const getPostBySlug = cache(async (slug: string): Promise<Post | null> => {
   if (!supabaseConfigured()) return null;
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("posts")
       .select("*, category:categories(*)")
@@ -102,12 +106,12 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   } catch {
     return null;
   }
-}
+});
 
-export async function getProductCategories(): Promise<ProductCategory[]> {
+export const getProductCategories = cache(async (): Promise<ProductCategory[]> => {
   if (!supabaseConfigured()) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("product_categories")
       .select("*")
@@ -116,12 +120,12 @@ export async function getProductCategories(): Promise<ProductCategory[]> {
   } catch {
     return [];
   }
-}
+});
 
-export async function getPublishedProducts(categorySlug?: string): Promise<Product[]> {
+export const getPublishedProducts = cache(async (categorySlug?: string): Promise<Product[]> => {
   if (!supabaseConfigured()) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let query = supabase
       .from("products")
       .select("*, category:product_categories(*)")
@@ -142,12 +146,12 @@ export async function getPublishedProducts(categorySlug?: string): Promise<Produ
   } catch {
     return [];
   }
-}
+});
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export const getProductBySlug = cache(async (slug: string): Promise<Product | null> => {
   if (!supabaseConfigured()) return null;
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("products")
       .select("*, category:product_categories(*)")
@@ -158,19 +162,17 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   } catch {
     return null;
   }
-}
+});
 
-// Products picked for an in-post embed grid — e.g. `[[products:ai-tools]]` —
-// so a draft post can showcase products without needing them published-wide
-// gating logic beyond the normal published flag.
+// Products picked for an in-post embed grid — e.g. `[[products:ai-tools]]`.
 export async function getProductsForEmbed(categorySlug: string, limit = 3): Promise<Product[]> {
   return (await getPublishedProducts(categorySlug)).slice(0, limit);
 }
 
-export async function getApprovedReviews(productId: string): Promise<Review[]> {
+export const getApprovedReviews = cache(async (productId: string): Promise<Review[]> => {
   if (!supabaseConfigured()) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("reviews")
       .select("*")
@@ -181,12 +183,12 @@ export async function getApprovedReviews(productId: string): Promise<Review[]> {
   } catch {
     return [];
   }
-}
+});
 
-export async function getPublishedServices(): Promise<Service[]> {
+export const getPublishedServices = cache(async (): Promise<Service[]> => {
   if (!supabaseConfigured()) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("services")
       .select("*")
@@ -196,12 +198,12 @@ export async function getPublishedServices(): Promise<Service[]> {
   } catch {
     return [];
   }
-}
+});
 
-export async function getServiceBySlug(slug: string): Promise<Service | null> {
+export const getServiceBySlug = cache(async (slug: string): Promise<Service | null> => {
   if (!supabaseConfigured()) return null;
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("services")
       .select("*")
@@ -212,4 +214,4 @@ export async function getServiceBySlug(slug: string): Promise<Service | null> {
   } catch {
     return null;
   }
-}
+});
