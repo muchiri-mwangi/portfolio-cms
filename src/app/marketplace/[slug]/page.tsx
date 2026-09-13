@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Star } from "lucide-react";
 import { getApprovedReviews, getProductBySlug } from "@/lib/data";
 import { buyProduct } from "../actions";
 import { submitReview } from "../reviews-actions";
+import HoneypotField from "@/components/HoneypotField";
 
 export const revalidate = 60;
 
@@ -77,13 +79,14 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="grid gap-10 md:grid-cols-2">
-        <div className="bg-soft aspect-square overflow-hidden rounded-2xl">
+        <div className="bg-soft relative aspect-square overflow-hidden rounded-2xl">
           {product.cover_image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={product.cover_image_url}
               alt={product.title}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 512px"
+              className="object-cover"
             />
           ) : (
             <div className="bg-accent/10 flex h-full w-full items-center justify-center text-6xl font-black text-accent/30">
@@ -208,6 +211,7 @@ export default async function ProductPage({
           </div>
 
           <form action={submitReviewForProduct} className="border-theme h-fit space-y-3 rounded-2xl border p-5">
+            <HoneypotField />
             <p className="text-sm font-semibold">Leave a review</p>
             <input
               name="reviewer_name"

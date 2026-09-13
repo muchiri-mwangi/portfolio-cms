@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getProductsForEmbed } from "@/lib/data";
 
 export default async function ProductEmbedGrid({
@@ -21,13 +22,14 @@ export default async function ProductEmbedGrid({
             href={`/marketplace/${p.slug}`}
             className="group flex flex-col overflow-hidden rounded-xl bg-[var(--color-bg)]"
           >
-            <div className="bg-soft aspect-[4/3] overflow-hidden">
+            <div className="bg-soft relative aspect-[4/3] overflow-hidden">
               {p.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={p.cover_image_url}
                   alt={p.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 33vw, 240px"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
                 <div className="bg-accent/10 flex h-full w-full items-center justify-center text-2xl font-black text-accent/30">

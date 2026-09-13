@@ -1,7 +1,16 @@
 import Link from "next/link";
-import { getCategories, getPublishedPosts, getSiteSettings } from "@/lib/data";
+import Image from "next/image";
+import {
+  getCategories,
+  getPublishedPosts,
+  getPublishedPostsPage,
+  getSiteSettings,
+  POSTS_PAGE_SIZE,
+} from "@/lib/data";
 import PostCard from "@/components/PostCard";
+import Pagination from "@/components/Pagination";
 import { subscribeToNewsletter } from "./actions";
+import HoneypotField from "@/components/HoneypotField";
 
 export const revalidate = 60;
 
@@ -10,17 +19,22 @@ export const metadata = { title: "Blog" };
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; subscribed?: string }>;
+  searchParams: Promise<{ category?: string; subscribed?: string; limited?: string; page?: string }>;
 }) {
-  const { category, subscribed } = await searchParams;
-  const [posts, categories, settings] = await Promise.all([
-    getPublishedPosts(category),
+  const { category, subscribed, limited, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const [{ items: posts, total }, categories, settings, allPosts] = await Promise.all([
+    getPublishedPostsPage(category, page),
     getCategories(),
     getSiteSettings(),
+    getPublishedPosts(), // full list, cached — used for the "recent" sidebar only
   ]);
 
-  const [featured, ...rest] = posts;
-  const recent = posts.slice(0, 5);
+  const totalPages = Math.max(1, Math.ceil(total / POSTS_PAGE_SIZE));
+  const featured = page === 1 ? posts[0] : undefined;
+  const rest = page === 1 ? posts.slice(1) : posts;
+  const recent = allPosts.slice(0, 5);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-16">
@@ -64,11 +78,12 @@ export default async function BlogPage({
             >
               <div className="bg-soft relative aspect-[16/9] md:aspect-auto">
                 {featured.cover_image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={featured.cover_image_url}
                     alt={featured.title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
                   <div className="bg-accent/10 flex h-full w-full items-center justify-center text-6xl font-black text-accent/30">
@@ -104,6 +119,13 @@ export default async function BlogPage({
               No posts yet — check back soon, or log in to the admin dashboard to publish your first one.
             </p>
           )}
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            basePath="/blog"
+            searchParams={{ category }}
+          />
         </div>
 
         {/* Sidebar */}
@@ -118,7 +140,13 @@ export default async function BlogPage({
                 Subscribed — thanks!
               </p>
             )}
+            {limited && (
+              <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-700">
+                You&apos;ve already subscribed recently — thanks for the enthusiasm!
+              </p>
+            )}
             <form action={subscribeToNewsletter} className="mt-4 flex gap-2">
+              <HoneypotField />
               <input
                 name="email"
                 type="email"

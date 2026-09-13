@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getPostBySlug } from "@/lib/data";
@@ -74,12 +75,15 @@ export default async function BlogPostPage({
       <p className="text-muted mt-3 text-sm">{date}</p>
 
       {post.cover_image_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={post.cover_image_url}
-          alt={post.title}
-          className="mt-8 w-full rounded-2xl object-cover"
-        />
+        <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-2xl">
+          <Image
+            src={post.cover_image_url}
+            alt={post.title}
+            fill
+            sizes="768px"
+            className="object-cover"
+          />
+        </div>
       )}
 
       <div className="prose-content mt-10">
