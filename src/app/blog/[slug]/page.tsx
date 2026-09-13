@@ -3,9 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
 import { getPostBySlug } from "@/lib/data";
 import { parsePostContent } from "@/lib/post-content";
+import { extractHeadings } from "@/lib/toc";
 import ProductEmbedGrid from "@/components/ProductEmbedGrid";
+import TableOfContents from "@/components/TableOfContents";
 
 export const revalidate = 60;
 
@@ -46,6 +49,7 @@ export default async function BlogPostPage({
   });
 
   const segments = parsePostContent(post.content);
+  const headings = extractHeadings(post.content);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -57,7 +61,7 @@ export default async function BlogPostPage({
   };
 
   return (
-    <article className="mx-auto max-w-3xl px-5 py-16">
+    <div className="mx-auto max-w-5xl px-5 py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -80,23 +84,44 @@ export default async function BlogPostPage({
             src={post.cover_image_url}
             alt={post.title}
             fill
-            sizes="768px"
+            sizes="960px"
             className="object-cover"
           />
         </div>
       )}
 
-      <div className="prose-content mt-10">
-        {segments.map((segment, i) =>
-          segment.type === "markdown" ? (
-            <ReactMarkdown key={i} remarkPlugins={[remarkGfm]}>
-              {segment.value}
-            </ReactMarkdown>
-          ) : (
-            <ProductEmbedGrid key={i} categorySlug={segment.categorySlug} limit={segment.limit} />
-          )
+      {/* Mobile: collapsible "On this page" above the content */}
+      {headings.length >= 2 && (
+        <details className="border-theme mt-8 rounded-xl border p-4 lg:hidden">
+          <summary className="cursor-pointer text-sm font-bold">On this page</summary>
+          <div className="mt-3">
+            <TableOfContents headings={headings} />
+          </div>
+        </details>
+      )}
+
+      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_240px]">
+        <article className="prose-content max-w-3xl">
+          {segments.map((segment, i) =>
+            segment.type === "markdown" ? (
+              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug]}>
+                {segment.value}
+              </ReactMarkdown>
+            ) : (
+              <ProductEmbedGrid key={i} categorySlug={segment.categorySlug} limit={segment.limit} />
+            )
+          )}
+        </article>
+
+        {/* Desktop: sticky sidebar TOC */}
+        {headings.length >= 2 && (
+          <aside className="hidden lg:block">
+            <div className="sticky top-24">
+              <TableOfContents headings={headings} />
+            </div>
+          </aside>
         )}
       </div>
-    </article>
+    </div>
   );
 }

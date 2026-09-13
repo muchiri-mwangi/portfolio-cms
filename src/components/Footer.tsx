@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SiteSettings } from "@/lib/types";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 export default function Footer({ settings }: { settings: SiteSettings }) {
   return (
@@ -10,7 +11,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
             <p className="font-bold">{settings.site_name}</p>
             <p className="text-muted mt-1 max-w-sm">{settings.tagline}</p>
           </div>
-          <div className="flex flex-wrap gap-5 text-muted">
+          <div className="flex flex-wrap items-center gap-5 text-muted">
             {settings.email && (
               <a href={`mailto:${settings.email}`} className="hover:text-primary">
                 {settings.email}
@@ -29,6 +30,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
             <Link href="/admin/login" className="hover:text-primary">
               Admin
             </Link>
+            <ScrollToTopButton />
           </div>
         </div>
         <div className="text-muted mt-8 flex flex-wrap items-center justify-between gap-3 text-xs">
