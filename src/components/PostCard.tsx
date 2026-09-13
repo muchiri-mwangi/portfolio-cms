@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Post } from "@/lib/types";
 
 export default function PostCard({ post }: { post: Post }) {
@@ -15,11 +16,12 @@ export default function PostCard({ post }: { post: Post }) {
     >
       <div className="bg-soft relative aspect-[16/9] w-full overflow-hidden">
         {post.cover_image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={post.cover_image_url}
             alt={post.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="bg-accent/10 flex h-full w-full items-center justify-center text-4xl font-black text-accent/30">

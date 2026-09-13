@@ -1,5 +1,6 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import { getSiteSettings } from "@/lib/data";
+import HoneypotField from "@/components/HoneypotField";
 import { sendContactMessage } from "./actions";
 
 export const metadata = { title: "Contact" };
@@ -7,10 +8,10 @@ export const metadata = { title: "Contact" };
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sent?: string }>;
+  searchParams: Promise<{ sent?: string; limited?: string }>;
 }) {
   const settings = await getSiteSettings();
-  const { sent } = await searchParams;
+  const { sent, limited } = await searchParams;
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-16">
@@ -59,7 +60,13 @@ export default async function ContactPage({
               Message sent — thanks, I&apos;ll get back to you soon.
             </p>
           )}
+          {limited && (
+            <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
+              Too many messages sent from this email recently — please try again in a bit.
+            </p>
+          )}
           <form action={sendContactMessage} className="space-y-4">
+            <HoneypotField />
             <div>
               <label className="text-sm font-semibold" htmlFor="name">
                 Name

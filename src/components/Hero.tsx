@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { SiteSettings } from "@/lib/types";
@@ -81,11 +82,13 @@ export default function Hero({ settings }: { settings: SiteSettings }) {
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
           {settings.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={settings.avatar_url}
               alt={settings.site_name}
-              className="relative h-full w-full rounded-3xl object-cover shadow-xl"
+              fill
+              priority
+              sizes="(max-width: 768px) 90vw, 384px"
+              className="relative rounded-3xl object-cover shadow-xl"
             />
           ) : (
             <div className="bg-accent relative flex h-full w-full items-center justify-center rounded-3xl text-6xl font-black text-white shadow-xl">
