@@ -1,17 +1,30 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Pagination from "@/components/Pagination";
 import type { Post } from "@/lib/types";
 
 export const metadata = { title: "Manage Posts" };
 
-export default async function AdminPostsPage() {
+const PAGE_SIZE = 20;
+
+export default async function AdminPostsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, count } = await supabase
     .from("posts")
-    .select("*, category:categories(*)")
-    .order("created_at", { ascending: false });
+    .select("*, category:categories(*)", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, from + PAGE_SIZE - 1);
 
   const posts = (data ?? []) as Post[];
+  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
     <div>
@@ -55,6 +68,8 @@ export default async function AdminPostsPage() {
           </p>
         )}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} basePath="/admin/posts" />
     </div>
   );
 }

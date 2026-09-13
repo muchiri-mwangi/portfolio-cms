@@ -1,9 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import DeliveryUploadForm from "@/components/DeliveryUploadForm";
+import Pagination from "@/components/Pagination";
 import type { Order, ServiceOrder } from "@/lib/types";
 import { deliverServiceOrder, updateServiceOrderStatus } from "./actions";
 
 export const metadata = { title: "Orders" };
+
+const PAGE_SIZE = 20;
 
 const statusColor: Record<string, string> = {
   pending: "bg-soft text-muted",
@@ -14,21 +17,37 @@ const statusColor: Record<string, string> = {
   failed: "bg-red-100 text-red-700",
 };
 
-export default async function OrdersPage() {
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ orders_page?: string; gigs_page?: string }>;
+}) {
+  const { orders_page, gigs_page } = await searchParams;
+  const productPage = Math.max(1, Number(orders_page) || 1);
+  const servicePage = Math.max(1, Number(gigs_page) || 1);
+  const productFrom = (productPage - 1) * PAGE_SIZE;
+  const serviceFrom = (servicePage - 1) * PAGE_SIZE;
+
   const supabase = await createClient();
 
-  const [{ data: productOrders }, { data: serviceOrders }] = await Promise.all([
+  const [
+    { data: productOrders, count: productCount },
+    { data: serviceOrders, count: serviceCount },
+  ] = await Promise.all([
     supabase
       .from("orders")
-      .select("*, product:products(title)")
+      .select("*, product:products(title)", { count: "exact" })
       .order("created_at", { ascending: false })
-      .limit(50),
+      .range(productFrom, productFrom + PAGE_SIZE - 1),
     supabase
       .from("service_orders")
-      .select("*, service:services(title)")
+      .select("*, service:services(title)", { count: "exact" })
       .order("created_at", { ascending: false })
-      .limit(50),
+      .range(serviceFrom, serviceFrom + PAGE_SIZE - 1),
   ]);
+
+  const productTotalPages = Math.max(1, Math.ceil((productCount ?? 0) / PAGE_SIZE));
+  const serviceTotalPages = Math.max(1, Math.ceil((serviceCount ?? 0) / PAGE_SIZE));
 
   return (
     <div>
@@ -58,6 +77,13 @@ export default async function OrdersPage() {
             <p className="text-muted py-6 text-center text-sm">No marketplace orders yet.</p>
           )}
         </div>
+        <Pagination
+          page={productPage}
+          totalPages={productTotalPages}
+          basePath="/admin/orders"
+          pageParam="orders_page"
+          searchParams={{ gigs_page }}
+        />
       </section>
 
       <section className="mt-10">
@@ -106,6 +132,13 @@ export default async function OrdersPage() {
             <p className="text-muted py-6 text-center text-sm">No service orders yet.</p>
           )}
         </div>
+        <Pagination
+          page={servicePage}
+          totalPages={serviceTotalPages}
+          basePath="/admin/orders"
+          pageParam="gigs_page"
+          searchParams={{ orders_page }}
+        />
       </section>
     </div>
   );

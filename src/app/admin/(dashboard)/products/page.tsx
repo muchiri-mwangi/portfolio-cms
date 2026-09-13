@@ -1,17 +1,30 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Pagination from "@/components/Pagination";
 import type { Product } from "@/lib/types";
 
 export const metadata = { title: "Manage Products" };
 
-export default async function AdminProductsPage() {
+const PAGE_SIZE = 20;
+
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, count } = await supabase
     .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, from + PAGE_SIZE - 1);
 
   const products = (data ?? []) as Product[];
+  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
     <div>
@@ -54,6 +67,8 @@ export default async function AdminProductsPage() {
           </p>
         )}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} basePath="/admin/products" />
     </div>
   );
 }
