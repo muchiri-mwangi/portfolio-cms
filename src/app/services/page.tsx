@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getPublishedServices } from "@/lib/data";
 
 export const metadata = { title: "Services" };
@@ -24,11 +25,12 @@ export default async function ServicesPage() {
           >
             <div className="bg-soft relative aspect-[4/3] w-full overflow-hidden">
               {s.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={s.cover_image_url}
                   alt={s.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
                 <div className="bg-accent/10 flex h-full w-full items-center justify-center text-4xl font-black text-accent/30">

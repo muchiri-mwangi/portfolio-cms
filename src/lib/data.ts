@@ -215,3 +215,73 @@ export const getServiceBySlug = cache(async (slug: string): Promise<Service | nu
     return null;
   }
 });
+
+// ── Paginated variants for the public listing pages ───────────────────────
+export const POSTS_PAGE_SIZE = 9;
+export const PRODUCTS_PAGE_SIZE = 9;
+
+export const getPublishedPostsPage = cache(
+  async (
+    categorySlug: string | undefined,
+    page: number,
+    pageSize = POSTS_PAGE_SIZE
+  ): Promise<{ items: Post[]; total: number }> => {
+    if (!supabaseConfigured()) return { items: [], total: 0 };
+    try {
+      const supabase = createPublicClient();
+      let query = supabase
+        .from("posts")
+        .select("*, category:categories(*)", { count: "exact" })
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+
+      if (categorySlug) {
+        const { data: cat } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("slug", categorySlug)
+          .single();
+        if (cat) query = query.eq("category_id", cat.id);
+      }
+
+      const from = (page - 1) * pageSize;
+      const { data, count } = await query.range(from, from + pageSize - 1);
+      return { items: data ?? [], total: count ?? 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+);
+
+export const getPublishedProductsPage = cache(
+  async (
+    categorySlug: string | undefined,
+    page: number,
+    pageSize = PRODUCTS_PAGE_SIZE
+  ): Promise<{ items: Product[]; total: number }> => {
+    if (!supabaseConfigured()) return { items: [], total: 0 };
+    try {
+      const supabase = createPublicClient();
+      let query = supabase
+        .from("products")
+        .select("*, category:product_categories(*)", { count: "exact" })
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+
+      if (categorySlug) {
+        const { data: cat } = await supabase
+          .from("product_categories")
+          .select("id")
+          .eq("slug", categorySlug)
+          .single();
+        if (cat) query = query.eq("category_id", cat.id);
+      }
+
+      const from = (page - 1) * pageSize;
+      const { data, count } = await query.range(from, from + pageSize - 1);
+      return { items: data ?? [], total: count ?? 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+);

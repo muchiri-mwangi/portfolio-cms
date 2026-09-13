@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getServiceBySlug } from "@/lib/data";
 import { orderService } from "../actions";
 
@@ -32,13 +33,14 @@ export default async function ServiceDetailPage({
   return (
     <div className="mx-auto max-w-4xl px-5 py-16">
       <div className="grid gap-10 md:grid-cols-2">
-        <div className="bg-soft aspect-square overflow-hidden rounded-2xl">
+        <div className="bg-soft relative aspect-square overflow-hidden rounded-2xl">
           {service.cover_image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={service.cover_image_url}
               alt={service.title}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 512px"
+              className="object-cover"
             />
           ) : (
             <div className="bg-accent/10 flex h-full w-full items-center justify-center text-6xl font-black text-accent/30">

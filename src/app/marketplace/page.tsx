@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { getProductCategories, getPublishedProducts } from "@/lib/data";
+import Image from "next/image";
+import { getProductCategories, getPublishedProductsPage, PRODUCTS_PAGE_SIZE } from "@/lib/data";
+import Pagination from "@/components/Pagination";
 
 export const metadata = { title: "Marketplace" };
 export const revalidate = 60;
@@ -7,13 +9,17 @@ export const revalidate = 60;
 export default async function MarketplacePage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; page?: string }>;
 }) {
-  const { category } = await searchParams;
-  const [products, categories] = await Promise.all([
-    getPublishedProducts(category),
+  const { category, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const [{ items: products, total }, categories] = await Promise.all([
+    getPublishedProductsPage(category, page),
     getProductCategories(),
   ]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PAGE_SIZE));
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-16">
@@ -61,11 +67,12 @@ export default async function MarketplacePage({
             )}
             <div className="bg-soft relative aspect-[4/3] w-full overflow-hidden">
               {p.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={p.cover_image_url}
                   alt={p.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
                 <div className="bg-accent/10 flex h-full w-full items-center justify-center text-4xl font-black text-accent/30">
@@ -97,6 +104,8 @@ export default async function MarketplacePage({
           Nothing for sale yet — check back soon.
         </p>
       )}
+
+      <Pagination page={page} totalPages={totalPages} basePath="/marketplace" searchParams={{ category }} />
     </div>
   );
 }
