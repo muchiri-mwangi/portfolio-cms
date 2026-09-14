@@ -99,6 +99,15 @@ export default async function ServiceOrderPage({
         </div>
       )}
 
+      {order.status !== "pending" && order.status !== "failed" && (
+        <p className="text-muted mt-8 text-sm">
+          <Link href="/account/login" className="text-primary font-semibold">
+            Create a free account
+          </Link>{" "}
+          with this same email to track this and future orders anytime.
+        </p>
+      )}
+
       {order.status === "failed" && (
         <Link
           href="/services"

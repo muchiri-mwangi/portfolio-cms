@@ -63,6 +63,12 @@ export default async function OrderPage({
               mention order {order.id.slice(0, 8)}.
             </p>
           )}
+          <p className="text-muted mt-8 text-sm">
+            <Link href="/account/login" className="text-primary font-semibold">
+              Create a free account
+            </Link>{" "}
+            with this same email to access this and future purchases anytime.
+          </p>
         </>
       ) : order.status === "failed" ? (
         <>

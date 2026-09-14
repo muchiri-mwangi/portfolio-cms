@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import type { SiteSettings } from "@/lib/types";
 
 const links = [
@@ -42,12 +42,20 @@ export default function Navbar({ settings }: { settings: SiteSettings }) {
             </li>
           ))}
         </ul>
-        <Link
-          href="/contact"
-          className="bg-primary hidden rounded-full px-4 py-2 text-sm font-semibold text-white md:inline-block"
-        >
-          Hire me
-        </Link>
+        <div className="hidden items-center gap-3 md:flex">
+          <Link
+            href="/account"
+            className="text-muted hover:text-primary flex items-center gap-1.5 text-sm font-medium"
+          >
+            <User size={16} /> My Account
+          </Link>
+          <Link
+            href="/contact"
+            className="bg-primary rounded-full px-4 py-2 text-sm font-semibold text-white"
+          >
+            Hire me
+          </Link>
+        </div>
 
         {/* Mobile menu button */}
         <button
@@ -79,6 +87,13 @@ export default function Navbar({ settings }: { settings: SiteSettings }) {
               </li>
             ))}
           </ul>
+          <Link
+            href="/account"
+            onClick={() => setOpen(false)}
+            className="border-theme mt-3 flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium"
+          >
+            <User size={16} /> My Account
+          </Link>
           <Link
             href="/contact"
             onClick={() => setOpen(false)}
