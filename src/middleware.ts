@@ -6,9 +6,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Only /admin needs the auth check + session refresh. Running this on
-  // every public page (home, blog, marketplace...) meant an extra
-  // Supabase auth round-trip before ANY page could render — a big part of
-  // why the site felt slow. Public pages don't need it at all.
-  matcher: ["/admin/:path*"],
+  // /admin needs the role check above; /account needs a logged-in
+  // customer. Public pages skip this entirely.
+  matcher: ["/admin/:path*", "/account/:path*"],
 };
