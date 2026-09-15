@@ -1,6 +1,7 @@
 import { Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Product, Review } from "@/lib/types";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { approveReview, deleteReview } from "./actions";
 
 export const metadata = { title: "Reviews" };
@@ -38,11 +39,11 @@ export default async function ReviewsPage() {
             </button>
           </form>
         )}
-        <form action={deleteReview.bind(null, r.id)}>
-          <button type="submit" className="border-theme rounded-lg border px-3 py-1.5 text-xs font-bold text-red-600">
-            Delete
-          </button>
-        </form>
+        <ConfirmDeleteButton
+          action={deleteReview.bind(null, r.id)}
+          confirmText={`Delete this review from ${r.reviewer_name}?`}
+          className="border-theme rounded-lg border px-3 py-1.5 text-xs font-bold text-red-600"
+        />
       </div>
     </div>
   );

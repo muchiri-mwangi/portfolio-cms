@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ServiceForm from "@/components/ServiceForm";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { updateService, deleteService } from "../../actions";
 import type { Service } from "@/lib/types";
 
@@ -27,11 +28,11 @@ export default async function EditServicePage({
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black">Edit service</h1>
-        <form action={deleteServiceWithId}>
-          <button type="submit" className="text-xs font-semibold text-red-600">
-            Delete service
-          </button>
-        </form>
+        <ConfirmDeleteButton
+          action={deleteServiceWithId}
+          label="Delete service"
+          confirmText={`Delete "${service.title}"? This can't be undone.`}
+        />
       </div>
 
       {saved && <p className="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">Saved.</p>}

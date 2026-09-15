@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProductCategories } from "@/lib/data";
 import ProductForm from "@/components/ProductForm";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { updateProduct, deleteProduct } from "../../actions";
 import type { Product } from "@/lib/types";
 
@@ -32,11 +33,11 @@ export default async function EditProductPage({
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black">Edit product</h1>
-        <form action={deleteProductWithId}>
-          <button type="submit" className="text-xs font-semibold text-red-600">
-            Delete product
-          </button>
-        </form>
+        <ConfirmDeleteButton
+          action={deleteProductWithId}
+          label="Delete product"
+          confirmText={`Delete "${product.title}"? This can't be undone.`}
+        />
       </div>
 
       {saved && (

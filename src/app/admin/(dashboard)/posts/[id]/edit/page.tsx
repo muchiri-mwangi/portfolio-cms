@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCategories } from "@/lib/data";
 import PostForm from "@/components/PostForm";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { updatePost, deletePost } from "../../actions";
 import type { Post } from "@/lib/types";
 
@@ -32,11 +33,11 @@ export default async function EditPostPage({
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black">Edit post</h1>
-        <form action={deletePostWithId}>
-          <button type="submit" className="text-xs font-semibold text-red-600">
-            Delete post
-          </button>
-        </form>
+        <ConfirmDeleteButton
+          action={deletePostWithId}
+          label="Delete post"
+          confirmText={`Delete "${post.title}"? This can't be undone.`}
+        />
       </div>
 
       {saved && (

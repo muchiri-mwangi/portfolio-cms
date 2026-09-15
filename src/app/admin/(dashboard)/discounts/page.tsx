@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Coupon } from "@/lib/types";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { createCoupon, toggleCoupon, deleteCoupon } from "./actions";
 
 export const metadata = { title: "Discounts" };
@@ -89,11 +90,10 @@ export default async function DiscountsPage({
                   {c.active ? "Active" : "Paused"}
                 </button>
               </form>
-              <form action={deleteCoupon.bind(null, c.id)}>
-                <button type="submit" className="text-xs font-semibold text-red-600">
-                  Delete
-                </button>
-              </form>
+              <ConfirmDeleteButton
+                action={deleteCoupon.bind(null, c.id)}
+                confirmText={`Delete code "${c.code}"? This can't be undone.`}
+              />
             </div>
           </div>
         ))}

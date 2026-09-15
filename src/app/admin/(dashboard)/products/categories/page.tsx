@@ -1,4 +1,5 @@
 import { getProductCategories } from "@/lib/data";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { createProductCategory, deleteProductCategory } from "./actions";
 
 export const metadata = { title: "Marketplace Categories" };
@@ -36,11 +37,10 @@ export default async function ProductCategoriesPage({
         {categories.map((c) => (
           <div key={c.id} className="border-theme flex items-center justify-between rounded-xl border p-4">
             <p className="font-semibold">{c.name}</p>
-            <form action={deleteProductCategory.bind(null, c.id)}>
-              <button type="submit" className="text-xs font-semibold text-red-600">
-                Delete
-              </button>
-            </form>
+            <ConfirmDeleteButton
+              action={deleteProductCategory.bind(null, c.id)}
+              confirmText={`Delete "${c.name}"? Products in this category will become uncategorized.`}
+            />
           </div>
         ))}
         {categories.length === 0 && (

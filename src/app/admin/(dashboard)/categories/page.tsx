@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Category } from "@/lib/types";
+import ConfirmDeleteButton from "@/components/ConfirmDeleteButton";
 import { createCategory, deleteCategory } from "./actions";
 
 export const metadata = { title: "Manage Categories" };
@@ -55,11 +56,10 @@ export default async function CategoriesPage({
               <p className="font-semibold">{c.name}</p>
               {c.description && <p className="text-muted text-xs">{c.description}</p>}
             </div>
-            <form action={deleteCategory.bind(null, c.id)}>
-              <button type="submit" className="text-xs font-semibold text-red-600">
-                Delete
-              </button>
-            </form>
+            <ConfirmDeleteButton
+              action={deleteCategory.bind(null, c.id)}
+              confirmText={`Delete "${c.name}"? Posts in this category will become uncategorized.`}
+            />
           </div>
         ))}
         {categories.length === 0 && (
