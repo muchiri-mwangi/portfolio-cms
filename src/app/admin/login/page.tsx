@@ -1,3 +1,4 @@
+import { ShieldCheck } from "lucide-react";
 import { login } from "./actions";
 
 export const metadata = { title: "Admin Login" };
@@ -10,50 +11,55 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-5 py-16">
-      <h1 className="text-2xl font-black">Admin login</h1>
-      <p className="text-muted mt-2 text-sm">
-        Sign in to manage your posts, categories, and site theme.
-      </p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-5 py-16">
+      <div className="flex items-center gap-2 text-slate-900">
+        <ShieldCheck size={22} className="text-indigo-500" />
+        <span className="font-bold">Admin</span>
+      </div>
 
-      {error && (
-        <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {error}
+      <div className="mt-6 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-xl font-black text-slate-900">Sign in</h1>
+        <p className="mt-2 text-sm text-slate-500">
+          Sign in to manage your posts, products, orders, and site settings.
         </p>
-      )}
 
-      <form action={login} className="mt-8 space-y-4">
-        <div>
-          <label className="text-sm font-semibold" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 outline-none focus:border-primary"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-semibold" htmlFor="password">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 outline-none focus:border-primary"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-primary w-full rounded-lg py-2.5 font-bold text-white"
-        >
-          Sign in
-        </button>
-      </form>
+        {error && (
+          <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
+        )}
+
+        <form action={login} className="mt-6 space-y-4">
+          <div>
+            <label className="text-sm font-semibold text-slate-700" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-semibold text-slate-700" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 outline-none focus:border-indigo-500"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-indigo-600 py-2.5 font-bold text-white hover:bg-indigo-700"
+          >
+            Sign in
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
