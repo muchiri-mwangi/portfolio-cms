@@ -26,13 +26,16 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Only the public site (which renders the custom cursor component) hides
+   the real cursor. Admin doesn't render that component, so it must keep
+   the normal cursor — otherwise the pointer just disappears there. */
 @media (pointer: fine) {
-  a,
-  button,
-  input,
-  textarea,
-  select,
-  body {
+  html[data-custom-cursor] a,
+  html[data-custom-cursor] button,
+  html[data-custom-cursor] input,
+  html[data-custom-cursor] textarea,
+  html[data-custom-cursor] select,
+  html[data-custom-cursor] body {
     cursor: none;
   }
 }

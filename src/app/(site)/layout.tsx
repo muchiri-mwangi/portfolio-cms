@@ -39,7 +39,12 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
 
   return (
-    <html lang="en" data-theme={settings.dark_mode ? "dark" : "light"} className="h-full">
+    <html
+      lang="en"
+      data-theme={settings.dark_mode ? "dark" : "light"}
+      data-custom-cursor
+      className="h-full"
+    >
       <head>
         <ThemeVars settings={settings} />
       </head>
