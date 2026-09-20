@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { convertToWebP } from "@/lib/image-utils";
 import type { Service } from "@/lib/types";
 
 export default function ServiceForm({
@@ -17,9 +18,10 @@ export default function ServiceForm({
   async function handleCoverUpload(file: File) {
     setUploading(true);
     try {
+      const converted = await convertToWebP(file);
       const supabase = createClient();
-      const path = `services/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-      const { error } = await supabase.storage.from("media").upload(path, file);
+      const path = `services/${Date.now()}-${converted.name.replace(/\s+/g, "-")}`;
+      const { error } = await supabase.storage.from("media").upload(path, converted);
       if (error) {
         alert(`Upload failed: ${error.message}`);
         return;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { convertToWebP } from "@/lib/image-utils";
 import type { SiteSettings } from "@/lib/types";
 
 const presets = [
@@ -27,9 +28,10 @@ export default function SettingsForm({
   async function handleAvatarUpload(file: File) {
     setUploading(true);
     try {
+      const converted = await convertToWebP(file);
       const supabase = createClient();
-      const path = `avatar/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-      const { error } = await supabase.storage.from("media").upload(path, file);
+      const path = `avatar/${Date.now()}-${converted.name.replace(/\s+/g, "-")}`;
+      const { error } = await supabase.storage.from("media").upload(path, converted);
       if (error) {
         alert(`Upload failed: ${error.message}`);
         return;
