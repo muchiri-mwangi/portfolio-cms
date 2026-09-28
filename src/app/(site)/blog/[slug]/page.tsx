@@ -4,11 +4,13 @@ import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
-import { getPostBySlug } from "@/lib/data";
+import { getPostBySlug, getRelatedPosts, getSiteSettings } from "@/lib/data";
 import { parsePostContent } from "@/lib/post-content";
 import { extractHeadings } from "@/lib/toc";
 import ProductEmbedGrid from "@/components/ProductEmbedGrid";
 import TableOfContents from "@/components/TableOfContents";
+import AuthorBox from "@/components/AuthorBox";
+import PostCard from "@/components/PostCard";
 
 export const revalidate = 60;
 
@@ -42,6 +44,11 @@ export default async function BlogPostPage({
 
   if (!post) notFound();
 
+  const [settings, relatedPosts] = await Promise.all([
+    getSiteSettings(),
+    getRelatedPosts(post.id, post.category_id),
+  ]);
+
   const date = new Date(post.created_at).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -58,6 +65,7 @@ export default async function BlogPostPage({
     datePublished: post.created_at,
     dateModified: post.updated_at,
     image: post.cover_image_url || undefined,
+    author: { "@type": "Person", name: settings.site_name },
   };
 
   return (
@@ -101,15 +109,32 @@ export default async function BlogPostPage({
       )}
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_240px]">
-        <article className="prose-content max-w-3xl">
-          {segments.map((segment, i) =>
-            segment.type === "markdown" ? (
-              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug]}>
-                {segment.value}
-              </ReactMarkdown>
-            ) : (
-              <ProductEmbedGrid key={i} categorySlug={segment.categorySlug} limit={segment.limit} />
-            )
+        <article className="min-w-0">
+          <div className="prose-content max-w-3xl">
+            {segments.map((segment, i) =>
+              segment.type === "markdown" ? (
+                <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug]}>
+                  {segment.value}
+                </ReactMarkdown>
+              ) : (
+                <ProductEmbedGrid key={i} categorySlug={segment.categorySlug} limit={segment.limit} />
+              )
+            )}
+          </div>
+
+          <div className="max-w-3xl">
+            <AuthorBox settings={settings} />
+          </div>
+
+          {relatedPosts.length > 0 && (
+            <div className="mt-14 max-w-3xl">
+              <h2 className="text-xl font-black">You might also like</h2>
+              <div className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedPosts.map((p) => (
+                  <PostCard key={p.id} post={p} />
+                ))}
+              </div>
+            </div>
           )}
         </article>
 

@@ -285,3 +285,43 @@ export const getPublishedProductsPage = cache(
     }
   }
 );
+
+// Related posts for the bottom of a blog post — same category first,
+// backfilled with the most recent other posts if there aren't enough.
+export const getRelatedPosts = cache(
+  async (currentPostId: string, categoryId: string | null, limit = 3): Promise<Post[]> => {
+    if (!supabaseConfigured()) return [];
+    try {
+      const supabase = createPublicClient();
+      const results: Post[] = [];
+
+      if (categoryId) {
+        const { data } = await supabase
+          .from("posts")
+          .select("*, category:categories(*)")
+          .eq("published", true)
+          .eq("category_id", categoryId)
+          .neq("id", currentPostId)
+          .order("created_at", { ascending: false })
+          .limit(limit);
+        results.push(...(data ?? []));
+      }
+
+      if (results.length < limit) {
+        const excludeIds = [currentPostId, ...results.map((p) => p.id)];
+        const { data } = await supabase
+          .from("posts")
+          .select("*, category:categories(*)")
+          .eq("published", true)
+          .not("id", "in", `(${excludeIds.join(",")})`)
+          .order("created_at", { ascending: false })
+          .limit(limit - results.length);
+        results.push(...(data ?? []));
+      }
+
+      return results;
+    } catch {
+      return [];
+    }
+  }
+);
