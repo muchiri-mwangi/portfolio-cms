@@ -219,6 +219,90 @@ export default function SettingsForm({
         </div>
       </section>
 
+      <section className="border-theme border-t pt-6">
+        <h2 className="font-bold">SEO & verification</h2>
+        <p className="text-muted mt-1 text-sm">
+          Paste the verification codes each service gives you — just the code itself, not
+          the full HTML tag. Leave blank until you need them.
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="text-sm font-semibold">Google Search Console</label>
+            <input
+              name="google_site_verification"
+              defaultValue={settings.google_site_verification ?? ""}
+              placeholder="verification code"
+              className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Bing Webmaster Tools</label>
+            <input
+              name="bing_site_verification"
+              defaultValue={settings.bing_site_verification ?? ""}
+              placeholder="verification code"
+              className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Facebook domain verification</label>
+            <input
+              name="facebook_domain_verification"
+              defaultValue={settings.facebook_domain_verification ?? ""}
+              placeholder="verification code"
+              className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Google Analytics (GA4)</label>
+            <input
+              name="google_analytics_id"
+              defaultValue={settings.google_analytics_id ?? ""}
+              placeholder="G-XXXXXXXXXX"
+              className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary"
+            />
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <label className="text-sm font-semibold">
+            Extra robots.txt rules (one path per line, optional)
+          </label>
+          <textarea
+            name="robots_disallow_extra"
+            rows={3}
+            defaultValue={settings.robots_disallow_extra ?? ""}
+            placeholder={"/some-private-page\n/drafts"}
+            className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 font-mono text-sm outline-none focus:border-primary"
+          />
+          <p className="text-muted mt-1 text-xs">
+            /admin, /api and /account are already blocked automatically — add paths here only
+            if you want to keep something else out of Google&apos;s index.
+          </p>
+        </div>
+      </section>
+
+      <section className="border-theme border-t pt-6">
+        <h2 className="font-bold">AdSense</h2>
+        <p className="text-muted mt-1 text-sm">
+          Add your publisher ID once you&apos;re approved, then switch ads on. Leaving this off
+          costs nothing and keeps the site exactly as it looks now.
+        </p>
+        <div className="mt-4">
+          <label className="text-sm font-semibold">AdSense Publisher ID</label>
+          <input
+            name="adsense_publisher_id"
+            defaultValue={settings.adsense_publisher_id ?? ""}
+            placeholder="ca-pub-XXXXXXXXXXXXXXXX"
+            className="border-theme mt-1 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary"
+          />
+        </div>
+        <label className="mt-4 flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" name="ads_enabled" defaultChecked={settings.ads_enabled} />
+          Show ads on the site
+        </label>
+      </section>
+
       <button
         type="submit"
         className="bg-primary rounded-full px-6 py-2.5 text-sm font-bold text-white"

@@ -25,6 +25,13 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   location: null,
   linkedin_url: null,
   github_url: null,
+  google_site_verification: null,
+  bing_site_verification: null,
+  facebook_domain_verification: null,
+  google_analytics_id: null,
+  adsense_publisher_id: null,
+  ads_enabled: false,
+  robots_disallow_extra: null,
 };
 
 function supabaseConfigured() {

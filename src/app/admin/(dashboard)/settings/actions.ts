@@ -21,6 +21,14 @@ export async function updateSettings(formData: FormData) {
     location: String(formData.get("location") ?? "").trim() || null,
     linkedin_url: String(formData.get("linkedin_url") ?? "").trim() || null,
     github_url: String(formData.get("github_url") ?? "").trim() || null,
+    google_site_verification: String(formData.get("google_site_verification") ?? "").trim() || null,
+    bing_site_verification: String(formData.get("bing_site_verification") ?? "").trim() || null,
+    facebook_domain_verification:
+      String(formData.get("facebook_domain_verification") ?? "").trim() || null,
+    google_analytics_id: String(formData.get("google_analytics_id") ?? "").trim() || null,
+    adsense_publisher_id: String(formData.get("adsense_publisher_id") ?? "").trim() || null,
+    ads_enabled: formData.get("ads_enabled") === "on",
+    robots_disallow_extra: String(formData.get("robots_disallow_extra") ?? "").trim() || null,
   };
 
   const { error } = await supabase.from("site_settings").update(payload).eq("id", 1);

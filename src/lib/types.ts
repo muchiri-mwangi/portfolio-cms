@@ -122,4 +122,11 @@ export type SiteSettings = {
   location: string | null;
   linkedin_url: string | null;
   github_url: string | null;
+  google_site_verification: string | null;
+  bing_site_verification: string | null;
+  facebook_domain_verification: string | null;
+  google_analytics_id: string | null;
+  adsense_publisher_id: string | null;
+  ads_enabled: boolean;
+  robots_disallow_extra: string | null;
 };
