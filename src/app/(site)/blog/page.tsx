@@ -11,6 +11,7 @@ import PostCard from "@/components/PostCard";
 import Pagination from "@/components/Pagination";
 import { subscribeToNewsletter } from "./actions";
 import HoneypotField from "@/components/HoneypotField";
+import AdSlot from "@/components/AdSlot";
 
 export const revalidate = 60;
 
@@ -162,6 +163,8 @@ export default async function BlogPage({
               </button>
             </form>
           </div>
+
+          <AdSlot publisherId={settings.adsense_publisher_id} enabled={settings.ads_enabled} />
 
           {categories.length > 0 && (
             <div className="border-theme rounded-2xl border p-5">

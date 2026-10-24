@@ -10,6 +10,7 @@ import { extractHeadings } from "@/lib/toc";
 import ProductEmbedGrid from "@/components/ProductEmbedGrid";
 import TableOfContents from "@/components/TableOfContents";
 import AuthorBox from "@/components/AuthorBox";
+import AdSlot from "@/components/AdSlot";
 import PostCard from "@/components/PostCard";
 
 export const revalidate = 60;
@@ -121,6 +122,12 @@ export default async function BlogPostPage({
               )
             )}
           </div>
+
+          <AdSlot
+            publisherId={settings.adsense_publisher_id}
+            enabled={settings.ads_enabled}
+            className="mt-10 max-w-3xl"
+          />
 
           <div className="max-w-3xl">
             <AuthorBox settings={settings} />

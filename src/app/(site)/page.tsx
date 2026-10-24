@@ -50,8 +50,34 @@ export default async function HomePage() {
   const settings = await getSiteSettings();
   const posts = (await getPublishedPosts()).slice(0, 3);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const sameAs = [settings.linkedin_url, settings.github_url].filter(Boolean);
+
+  // Helps Google understand this is a real person offering real services —
+  // eligible for knowledge-panel style results, and the location field
+  // supports local search ("technician near Murang'a").
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: settings.site_name,
+    description: settings.bio,
+    url: siteUrl,
+    image: settings.avatar_url || undefined,
+    email: settings.email || undefined,
+    telephone: settings.phone || undefined,
+    address: settings.location
+      ? { "@type": "PostalAddress", addressLocality: settings.location }
+      : undefined,
+    sameAs: sameAs.length ? sameAs : undefined,
+    founder: { "@type": "Person", name: settings.site_name, jobTitle: settings.tagline },
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Hero settings={settings} />
 
       {/* Skills */}
